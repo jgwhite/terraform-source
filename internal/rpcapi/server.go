@@ -31,9 +31,10 @@ func ServePlugin(ctx context.Context, opts ServerOpts) error {
 	plugin.Serve(&plugin.ServeConfig{
 		HandshakeConfig: handshake,
 		VersionedPlugins: map[int]plugin.PluginSet{
-			1: plugin.PluginSet{
+			1: {
 				"tfcore": &corePlugin{
 					experimentsAllowed: opts.ExperimentsAllowed,
+					stopCh:         opts.StopCh,
 				},
 			},
 		},
@@ -63,6 +64,7 @@ var ErrNotPluginClient = errors.New("caller is not a plugin client")
 
 type ServerOpts struct {
 	ExperimentsAllowed bool
+	StopCh         chan<- struct{}
 }
 
 // handshake is the HandshakeConfig used to begin negotiation between client

@@ -54,15 +54,22 @@ func (c cliCommand) Run(args []string) int {
 		return 1
 	}
 
+	stopCh := make(chan struct{})
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	go func() {
-		// We'll adapt the caller's "shutdown channel" into a context
-		// cancellation.
 		for {
 			select {
+			// We'll adapt the caller's "shutdown channel" into a context
+			// cancellation.
 			case <-c.opts.ShutdownCh:
+				cancel()
+			// We also supply a "stop channel" to the server, to allow
+			// implementation of the client-initiated Stop RPC. This also
+			// results in a context cancellation.
+			case <-stopCh:
 				cancel()
 			case <-ctx.Done():
 				return
@@ -72,6 +79,7 @@ func (c cliCommand) Run(args []string) int {
 
 	err := ServePlugin(ctx, ServerOpts{
 		ExperimentsAllowed: c.opts.ExperimentsAllowed,
+		StopCh:             stopCh,
 	})
 	if err != nil {
 		if err == ErrNotPluginClient {
