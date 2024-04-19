@@ -36,20 +36,14 @@ type setupServer struct {
 	mu sync.Mutex
 }
 
-func newSetupServer(
-	initOthers func(context.Context, *terraform1.ClientCapabilities) (*terraform1.ServerCapabilities, error),
-	stopCh chan<- struct{},
-) terraform1.SetupServer {
+func newSetupServer(initOthers func(context.Context, *terraform1.ClientCapabilities) (*terraform1.ServerCapabilities, error), stopCh chan<- struct{}) terraform1.SetupServer {
 	return &setupServer{
 		initOthers: initOthers,
 		stopSh:     stopCh,
 	}
 }
 
-func (s *setupServer) Handshake(
-	ctx context.Context,
-	req *terraform1.Handshake_Request,
-) (*terraform1.Handshake_Response, error) {
+func (s *setupServer) Handshake(ctx context.Context, req *terraform1.Handshake_Request) (*terraform1.Handshake_Response, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 

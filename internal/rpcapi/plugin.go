@@ -19,7 +19,7 @@ type corePlugin struct {
 	plugin.Plugin
 
 	experimentsAllowed bool
-	stopCh         chan<- struct{}
+	stopCh             chan<- struct{}
 }
 
 func (p *corePlugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
@@ -31,7 +31,7 @@ func (p *corePlugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, 
 func (p *corePlugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
 	generalOpts := &serviceOpts{
 		experimentsAllowed: p.experimentsAllowed,
-		stopCh:         p.stopCh,
+		stopCh:             p.stopCh,
 	}
 	registerGRPCServices(s, generalOpts)
 	return nil
@@ -45,10 +45,7 @@ func registerGRPCServices(s *grpc.Server, opts *serviceOpts) {
 	terraform1.RegisterSetupServer(s, setup)
 }
 
-func serverHandshake(
-	s *grpc.Server,
-	opts *serviceOpts,
-) func(context.Context, *terraform1.ClientCapabilities) (*terraform1.ServerCapabilities, error) {
+func serverHandshake(s *grpc.Server, opts *serviceOpts) func(context.Context, *terraform1.ClientCapabilities) (*terraform1.ServerCapabilities, error) {
 	dependencies := dynrpcserver.NewDependenciesStub()
 	terraform1.RegisterDependenciesServer(s, dependencies)
 	stacks := dynrpcserver.NewStacksStub()
@@ -95,5 +92,5 @@ func serverHandshake(
 // structure, if needed.
 type serviceOpts struct {
 	experimentsAllowed bool
-	stopCh         chan<- struct{}
+	stopCh             chan<- struct{}
 }
