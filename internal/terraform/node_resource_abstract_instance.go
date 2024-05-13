@@ -1815,7 +1815,7 @@ func (n *NodeAbstractResourceInstance) planDataSource(ctx EvalContext, checkRule
 	newVal, readDeferred, readDiags := n.readDataSource(ctx, configVal)
 
 	if readDeferred != nil {
-		ctx.Deferrals().ReportDataSourceInstanceDeferred(n.Addr)
+		ctx.Deferrals().ReportDataSourceInstanceDeferred(n.Addr, newVal)
 	}
 
 	// Now we've loaded the data, and diags tells us whether we were successful
@@ -2057,7 +2057,8 @@ func (n *NodeAbstractResourceInstance) applyDataSource(ctx EvalContext, planned 
 	}
 
 	if readDeferred != nil {
-		ctx.Deferrals().ReportDataSourceInstanceDeferred(n.Addr)
+		// Just skip data sources that are being deferred. Nothing, that
+		// references them should be calling them.
 		return nil, keyData, diags
 	}
 

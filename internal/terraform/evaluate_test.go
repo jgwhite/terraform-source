@@ -17,6 +17,7 @@ import (
 	"github.com/hashicorp/terraform/internal/lang/marks"
 	"github.com/hashicorp/terraform/internal/namedvals"
 	"github.com/hashicorp/terraform/internal/plans"
+	"github.com/hashicorp/terraform/internal/plans/deferring"
 	"github.com/hashicorp/terraform/internal/providers"
 	"github.com/hashicorp/terraform/internal/states"
 	"github.com/hashicorp/terraform/internal/tfdiags"
@@ -288,6 +289,7 @@ func TestEvaluatorGetResource(t *testing.T) {
 		},
 		State:       stateSync,
 		NamedValues: namedvals.NewState(),
+		Deferrals:   deferring.NewDeferred(addrs.NewDirectedGraph[addrs.ConfigResource](), false),
 		Plugins: schemaOnlyProvidersForTesting(map[addrs.Provider]providers.ProviderSchema{
 			addrs.NewDefaultProvider("test"): {
 				ResourceTypes: map[string]providers.Schema{
@@ -528,6 +530,7 @@ func TestEvaluatorGetResource_changes(t *testing.T) {
 		},
 		State:       stateSync,
 		NamedValues: namedvals.NewState(),
+		Deferrals:   deferring.NewDeferred(addrs.NewDirectedGraph[addrs.ConfigResource](), false),
 		Plugins:     schemaOnlyProvidersForTesting(schemas.Providers),
 	}
 
