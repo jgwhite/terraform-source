@@ -311,7 +311,7 @@ func (n *NodePlannableResourceInstance) managedResourceExecute(ctx EvalContext) 
 			// refresh or planning stage. We'll report the deferral and
 			// store what we could produce in the deferral tracker.
 			deferrals.ReportResourceInstanceDeferred(addr, deferred.Reason, change)
-		} else if !deferrals.ShouldDeferResourceInstanceChanges(n.Addr) {
+		} else if !deferrals.ShouldDeferResourceInstanceChanges(addr) {
 			// We intentionally write the change before the subsequent checks, because
 			// all of the checks below this point are for problems caused by the
 			// context surrounding the change, rather than the change itself, and
@@ -383,7 +383,7 @@ func (n *NodePlannableResourceInstance) managedResourceExecute(ctx EvalContext) 
 			// In this case, the expression evaluator should use the placeholder
 			// value registered here as the value of this resource instance,
 			// instead of using the plan.
-			deferrals.ReportResourceInstanceDeferred(n.Addr, providers.DeferredReasonDeferredPrereq, change)
+			deferrals.ReportResourceInstanceDeferred(addr, providers.DeferredReasonDeferredPrereq, change)
 		}
 	} else {
 		// In refresh-only mode we need to evaluate the for-each expression in
